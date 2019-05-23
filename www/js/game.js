@@ -62,7 +62,7 @@ Math.__proto__.getAllPossibleCombinations=function(array) {
     return uniques;
 }
 var pageElements={
-    cardsHolder:".app",
+    cardsHolder:".play-area",
 }
 var arrayMath={
     equals:function(a,b){
@@ -112,11 +112,17 @@ var game={
     },
     set:[],
     selectedNumbers:[],
-
+    setup:function(){
+        game.reset();
+        $("#hint").click(function(){game.displayHint()})
+    },
     generateGame:function(){
         for(var i=0;i<game.using;i++){
             game.set.push(Math.inclusiveRandom(game.minium,game.maxium));
         }
+    },
+    displayHint:function(){
+        console.log(game.generateSolution());
     },
     displayGame:function(){
         var elem=$(pageElements.cardsHolder);
@@ -134,14 +140,14 @@ var game={
           $(".op").click(function(){game.performOperation(this)});
     },
     selectElement:function(element){
-        console.log("selecting")
+        //console.log("selecting")
         var id=parseInt(element.firstChild.id);
-        console.log(game.selectedNumbers,id,game.selectedNumbers.indexOf(id),game.selectedNumbers.length>1)
+       // console.log(game.selectedNumbers,id,game.selectedNumbers.indexOf(id),game.selectedNumbers.length>1)
         if(game.selectedNumbers.length>1){
             game.selectedNumbers=[game.selectedNumbers[0],game.selectedNumbers[1]]
             //console.log(game.selectedNumbers.length)
             if(game.selectedNumbers.indexOf(id)>-1){
-                console.log("h19")
+                //console.log("h19")
                 $("#"+id).css("border","0px solid black");
                 var holder=[];
                 for(var i=0;i<game.selectedNumbers.length;i++){
@@ -154,7 +160,7 @@ var game={
         }else if(game.selectedNumbers.indexOf(id)>-1){
             var holder=[];
             $("#"+id).css("border","0px solid black")
-            console.log("h2")
+            //console.log("h2")
             for(var i=0;i<game.selectedNumbers.length;i++){
                 if(game.selectedNumbers[i]!=id){
                     holder.push(game.selectedNumbers[i]);
@@ -165,7 +171,7 @@ var game={
             }
             game.selectedNumbers=holder;
         }else{
-            console.log("h5")
+            //console.log("h5")
              game.selectedNumbers.push(id);
         }
         for(var i=0;i<game.selectedNumbers.length;i++){
@@ -207,6 +213,7 @@ var game={
     },
 
     generateSolution:function(){
+        console.log("generating")
         var numbers=game.set;
         var combos=Math.getAllPossibleCombinations(numbers);
         var resault="";
@@ -273,7 +280,8 @@ var game={
         game.selectedNumbers=[];
         game.generateGame();
         game.displayGame();
-    }
+    },
+
    
 
 }

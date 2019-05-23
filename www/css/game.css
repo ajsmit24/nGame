@@ -10,9 +10,9 @@
 .not-selected{
     border: 2px solid black;
 }
-.app{
-    /*width:500px;
-    height:500px*/
+.play-area{
+    width:100%;
+    height:100%
 }
 .main-container{
     display: flex;
@@ -46,4 +46,9 @@
     font-size:24px;
     position:absolute;
     top:40%
+}
+#hint{
+    position:absolute;
+    top:5px;
+    right:5px;
 }
