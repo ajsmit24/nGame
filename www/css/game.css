@@ -52,3 +52,13 @@
     top:5px;
     right:5px;
 }
+#undo{
+    position:absolute;
+    top:25px;
+    right:5px;
+}
+#settings{
+    position:absolute;
+    top:45px;
+    right:5px;
+}

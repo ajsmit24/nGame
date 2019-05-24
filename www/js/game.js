@@ -89,6 +89,9 @@ var sm={
         return a*b;
     },
     div:function(a,b,sp){
+        if(sp&&a/b<1){
+            return b/a;
+        }
         return a/b;
     },
 }
@@ -112,9 +115,16 @@ var game={
     },
     set:[],
     selectedNumbers:[],
+    saveState:{
+        html:"",
+        selected:[],
+    },
     setup:function(){
         game.reset();
         $("#hint").click(function(){game.displayHint()})
+        $("#undo").click(function(){game.restore()})
+        game.save();
+
     },
     generateGame:function(){
         for(var i=0;i<game.using;i++){
@@ -129,7 +139,6 @@ var game={
         for(var i=0;i<game.set.length;i++){
             elem.append("<div class='card not-selected' data-numbIndex="+i+"><div class='number' id="+i+">"+game.set[i]+"</div></div>");
         }
-         $(".card").click(function(){game.selectElement(this)});
          elem.append("<div id='ops' class='main-container'></div>");
          var ops=$("#ops");
          var opKeys=Object.keys(game.operators);
@@ -137,7 +146,7 @@ var game={
          for(var j=0,k=0;j<opKeys.length,k<mathKey.length;j++,k++){
              ops.append("<div class='op'data-index='"+j+"'><div class='center'>"+game.operators[opKeys[j]]+"</div></div>");
          }
-          $(".op").click(function(){game.performOperation(this)});
+         game.bindInsideFunctions();
     },
     selectElement:function(element){
         //console.log("selecting")
@@ -182,7 +191,8 @@ var game={
     },
 
     performOperation:function(element){
-        $(".card").off("click");
+        game.save();
+        game.unbindInsideFunctions();
         if(game.selectedNumbers.length>1){
         var i=parseInt(element.getAttribute("data-index"));
         var keys=Object.keys(sm);
@@ -199,9 +209,29 @@ var game={
         var j=Math.min(game.selectedNumbers[1],game.selectedNumbers[0])
         game.selectedNumbers=[];
         $(pageElements.cardsHolder).append("<div class='card not-selected' data-numbIndex="+j+"><div class='number' id="+j+">"+newNumb+"</div></div>");
-        $(".card").click(function(){game.selectElement(this)});
+        game.bindInsideFunctions();
         game.checkSolution()
         }
+    },
+    save:function(){
+        game.saveState.html=$(pageElements.cardsHolder)[0].innerHTML+"";
+        game.saveState.selected=game.selectedNumbers.slice(0);
+    },
+    restore:function(){
+        game.unbindInsideFunctions();
+        $(pageElements.cardsHolder)[0].innerHTML=game.saveState.html;
+        game.bindInsideFunctions();
+        game.selectedNumbers=game.saveState.selected.slice(0);
+        game.saveState.selected=[];
+        game.saveState.html="";
+    },
+    bindInsideFunctions:function(){
+         $(".card").click(function(){game.selectElement(this)});
+         $(".op").click(function(){game.performOperation(this)});
+    },
+    unbindInsideFunctions:function(){
+      $(".card").off("click");  
+      $(".op").off("click");
     },
 
     updateDisplay:function(){
