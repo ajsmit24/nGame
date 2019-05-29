@@ -118,12 +118,19 @@ var game={
     saveState:{
         html:"",
         selected:[],
+        defaultState:{
+            html:"",
+            selected:[]
+        }
     },
     setup:function(){
         game.reset();
-        $("#hint").click(function(){game.displayHint()})
+        /*$("#hint").click(function(){game.displayHint()})
         $("#undo").click(function(){game.restore()})
-        game.save();
+        $("#not-solvable").click(function(){game.isNotSolvable()})
+        $("#settings").click(function(){app.pageNavigation.switchPage(1)})*/
+        game.save(true);
+        //app.pages[1].initalization();
 
     },
     generateGame:function(){
@@ -132,7 +139,12 @@ var game={
         }
     },
     displayHint:function(){
-        console.log(game.generateSolution());
+        var hint=game.generateSolution()
+         console.log(hint);
+         var isAlready=$(".play-update")[0];
+         if(isAlready){isAlready.outerHTML="";}
+         $(pageElements.cardsHolder).append("<div id='vis-hint' class='play-update'>"+hint+"</div>")
+        
     },
     displayGame:function(){
         var elem=$(pageElements.cardsHolder);
@@ -146,7 +158,7 @@ var game={
          for(var j=0,k=0;j<opKeys.length,k<mathKey.length;j++,k++){
              ops.append("<div class='op'data-index='"+j+"'><div class='center'>"+game.operators[opKeys[j]]+"</div></div>");
          }
-         game.bindInsideFunctions();
+         game.bind(true);
     },
     selectElement:function(element){
         //console.log("selecting")
@@ -192,7 +204,7 @@ var game={
 
     performOperation:function(element){
         game.save();
-        game.unbindInsideFunctions();
+        game.unbind();
         if(game.selectedNumbers.length>1){
         var i=parseInt(element.getAttribute("data-index"));
         var keys=Object.keys(sm);
@@ -209,29 +221,46 @@ var game={
         var j=Math.min(game.selectedNumbers[1],game.selectedNumbers[0])
         game.selectedNumbers=[];
         $(pageElements.cardsHolder).append("<div class='card not-selected' data-numbIndex="+j+"><div class='number' id="+j+">"+newNumb+"</div></div>");
-        game.bindInsideFunctions();
+        game.bind();
         game.checkSolution()
         }
     },
-    save:function(){
+    save:function(isDef){
         game.saveState.html=$(pageElements.cardsHolder)[0].innerHTML+"";
         game.saveState.selected=game.selectedNumbers.slice(0);
+        if(isDef){
+            game.saveState.defaultState.html=game.saveState.html+"";
+            game.saveState.defaultState.selected=[];
+        }
     },
     restore:function(){
-        game.unbindInsideFunctions();
+        game.unbind();
         $(pageElements.cardsHolder)[0].innerHTML=game.saveState.html;
-        game.bindInsideFunctions();
+        game.bind();
         game.selectedNumbers=game.saveState.selected.slice(0);
-        game.saveState.selected=[];
-        game.saveState.html="";
+        game.saveState.selected=game.saveState.defaultState.selected;
+        game.saveState.html=game.saveState.defaultState.html;
     },
-    bindInsideFunctions:function(){
+    bind:function(outsideAlso){
          $(".card").click(function(){game.selectElement(this)});
          $(".op").click(function(){game.performOperation(this)});
+         if(outsideAlso){
+             console.log("bind ind")
+            $("#hint").click(function(){game.displayHint()})
+            $("#undo").click(function(){game.restore()})
+            $("#not-solvable").click(function(){game.isNotSolvable()})
+            $("#settings").click(function(){app.pageNavigation.switchPage(1)})  
+         }
     },
-    unbindInsideFunctions:function(){
+    unbind:function(outsideAlso){
       $(".card").off("click");  
       $(".op").off("click");
+      if(outsideAlso){
+            $("#hint").off("click");  
+            $("#undo").off("click");  
+            $("#not-solvable").off("click");
+            $("#settings").off("click");
+         }
     },
 
     updateDisplay:function(){
@@ -298,11 +327,25 @@ var game={
     },
 
     checkSolution:function(){
+        console.log(5)
         var x= parseInt($(".card")[0].innerText)==game.n&&$(".card").length>-1;
         if(x){
-             $(pageElements.cardsHolder).append("<div id='winner'>Winner</div>")
-             $("#winner").click(function(){game.reset()})
+           game.winner(); 
         }
+    },
+    winner:function(){
+         game.unbind(true);
+         var isAlready=$(".play-update")[0];
+         if(isAlready){isAlready.outerHTML="";}
+         $(pageElements.cardsHolder).append("<div id='winner'>Winner</div>")
+         $("#winner").click(function(){game.reset();})
+    },
+    solvable:function(){
+         game.unbind(true);
+         var isAlready=$(".play-update")[0];
+         if(isAlready){isAlready.outerHTML="";}
+         $(pageElements.cardsHolder).append("<div id='yes-solvable'>This is solvable!</div>")
+         $("#yes-solvable").click(function(){game.bind();this.outerHTML=""})
     },
     reset:function(){
         $(pageElements.cardsHolder)[0].innerHTML="";
@@ -310,7 +353,16 @@ var game={
         game.selectedNumbers=[];
         game.generateGame();
         game.displayGame();
+        game.save(true);
     },
+    isNotSolvable:function(){
+        console.log("solving")
+        if(!game.generateSolution()){
+            game.winner();
+        }else{
+            game.solvable();
+        }
+    }
 
    
 

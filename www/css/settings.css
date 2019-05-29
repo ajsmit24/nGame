@@ -1,0 +1,13 @@
+.central-display{
+    position:absolute;
+    top:40%;
+    right:40%
+}
+.save-check{
+    color:green;
+    font-size:80px
+}
+.save-x{
+    color:red;
+    font-size:80px
+}

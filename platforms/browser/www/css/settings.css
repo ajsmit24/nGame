@@ -1,0 +1,8 @@
+.central-display{
+    position:absolute;
+    top:40%;
+}
+.save-check{
+    color:green;
+    font-size:30px
+}

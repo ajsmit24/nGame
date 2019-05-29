@@ -20,7 +20,7 @@ var app = {
     // Application Constructor
     initialize: function() {
         document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
-        game.setup();
+        app.pageNavigation.switchPage(0);
     },
 
     // deviceready Event Handler
@@ -41,7 +41,40 @@ var app = {
         receivedElement.setAttribute('style', 'display:block;');
 
         console.log('Received Event: ' + id);
-    }
+    },
+    pageNavigation:{
+        switchPage:function(id){
+            app.pageNavigation.pastWindow=app.pageNavigation.currentWindow;
+            app.pageNavigation.currentWindow=id;
+            for(var i=0;i< app.pages.length;i++){
+                if(i!=id){
+                    document.getElementById(app.pages[i].path).style.display='none';
+                }else{
+                    document.getElementById(app.pages[i].path).style.display='block';
+                }
+            }
+            app.pages[id].initalization();
+        },
+        pastWindow:0,
+        currentWindow:0,
+        goBack:function(){
+            app.pageNavigation.switchPage(app.pageNavigation.pastWindow);
+        }
+    },
+    pages:[
+        {id:0,
+        path:"play-screen-page",
+        initalization:function(){
+                game.setup();
+            }
+        },
+        {id:1,
+        path:"settings-page",
+        initalization:function(){
+                settings.setup();
+            }
+        },
+    ]
 };
 
 app.initialize();
