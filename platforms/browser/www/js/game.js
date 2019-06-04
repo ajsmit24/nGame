@@ -139,7 +139,12 @@ var game={
         }
     },
     displayHint:function(){
-        console.log(game.generateSolution());
+        var hint=game.generateSolution()
+         console.log(hint);
+         var isAlready=$(".play-update")[0];
+         if(isAlready){isAlready.outerHTML="";}
+         $(pageElements.cardsHolder).append("<div id='vis-hint' class='play-update'>"+hint+"</div>")
+        
     },
     displayGame:function(){
         var elem=$(pageElements.cardsHolder);
@@ -328,11 +333,18 @@ var game={
         }
     },
     winner:function(){
-        game.unbind(true);
-         var isAlready=$("#winner")[0];
+         game.unbind(true);
+         var isAlready=$(".play-update")[0];
          if(isAlready){isAlready.outerHTML="";}
          $(pageElements.cardsHolder).append("<div id='winner'>Winner</div>")
          $("#winner").click(function(){game.reset();})
+    },
+    solvable:function(){
+         game.unbind(true);
+         var isAlready=$(".play-update")[0];
+         if(isAlready){isAlready.outerHTML="";}
+         $(pageElements.cardsHolder).append("<div id='yes-solvable'>This is solvable!</div>")
+         $("#yes-solvable").click(function(){game.bind(true);this.outerHTML=""})
     },
     reset:function(){
         $(pageElements.cardsHolder)[0].innerHTML="";
@@ -347,10 +359,7 @@ var game={
         if(!game.generateSolution()){
             game.winner();
         }else{
-            
+            game.solvable();
         }
     }
-
-   
-
 }

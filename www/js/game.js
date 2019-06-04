@@ -151,7 +151,7 @@ var game={
         for(var i=0;i<game.set.length;i++){
             elem.append("<div class='card not-selected' data-numbIndex="+i+"><div class='number' id="+i+">"+game.set[i]+"</div></div>");
         }
-         elem.append("<div id='ops' class='main-container'></div>");
+         elem.append("<div id='ops' class='main-container '></div>");
          var ops=$("#ops");
          var opKeys=Object.keys(game.operators);
          var mathKey=Object.keys(sm);
@@ -245,10 +245,9 @@ var game={
          $(".card").click(function(){game.selectElement(this)});
          $(".op").click(function(){game.performOperation(this)});
          if(outsideAlso){
-             console.log("bind ind")
             $("#hint").click(function(){game.displayHint()})
             $("#undo").click(function(){game.restore()})
-            $("#not-solvable").click(function(){game.isNotSolvable()})
+            $("#not-solvable").click(function(){ console.log(game.using,game.using>4);if(game.using>4){ game.generateLoadingIMG();console.log("h1")}setTimeout(function(){game.isNotSolvable(), 10});})
             $("#settings").click(function(){app.pageNavigation.switchPage(1)})  
          }
     },
@@ -261,6 +260,7 @@ var game={
             $("#not-solvable").off("click");
             $("#settings").off("click");
          }
+        game.removeLoadingIMG()
     },
 
     updateDisplay:function(){
@@ -317,9 +317,15 @@ var game={
             res[numbInd[z]+1]="";}res[numbInd[y]-1]=""; }
             }
         }
+        if(c==combos.length-1){
+            
+            setTimeout(function(){
+                console.log("y",c);game.removeLoadingIMG();
+            }, 15);}else{console.log("n",c)}
         
     }
     if(resault.length<1){
+           
             return false;
         }else{
             return resault;
@@ -327,7 +333,6 @@ var game={
     },
 
     checkSolution:function(){
-        console.log(5)
         var x= parseInt($(".card")[0].innerText)==game.n&&$(".card").length>-1;
         if(x){
            game.winner(); 
@@ -345,9 +350,10 @@ var game={
          var isAlready=$(".play-update")[0];
          if(isAlready){isAlready.outerHTML="";}
          $(pageElements.cardsHolder).append("<div id='yes-solvable'>This is solvable!</div>")
-         $("#yes-solvable").click(function(){game.bind();this.outerHTML=""})
+         $("#yes-solvable").click(function(){game.bind(true);this.outerHTML=""})
     },
     reset:function(){
+        game.unbind(true);
         $(pageElements.cardsHolder)[0].innerHTML="";
         game.set=[];
         game.selectedNumbers=[];
@@ -362,8 +368,14 @@ var game={
         }else{
             game.solvable();
         }
+    },
+    generateLoadingIMG:function(){
+        document.getElementById("loading").style.display='block';
+        console.log(document.getElementById("loading"),(new Date).getTime())
+        
+    },
+    removeLoadingIMG:function(){
+        console.log((new Date).getTime())
+        document.getElementById("loading").style.display='none';
     }
-
-   
-
 }
